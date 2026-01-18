@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "train:othello": "sptc othello/node.js -d \"TRAIN\" | node",
+    "test:othello": "sptc othello/node.js -d \"TEST\" | node",
+    "generate:othello": "sptc othello/node.js -d \"GENERATE\" | node",
+    "game:othello": "sptcd -d -r index.s"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs-node-gpu": "^4.22.0",
+    "sptc": "0.0.37"
+  }
+}
