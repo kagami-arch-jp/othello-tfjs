@@ -267,7 +267,7 @@ if(isBrowser()) main({
     }else if((agentFirst&&bn>wn) || (!agentFirst&&bn<wn)) {
       alert_msg='agent won!'
     }else{
-      alert_msg='record saved'
+      alert_msg=isGitPage()? 'you won!': 'record saved'
       fetchSaveRecord(g.customSteps)
     }
 

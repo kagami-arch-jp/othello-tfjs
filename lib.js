@@ -4,6 +4,9 @@ function isBrowser() {
 function isServer() {
   return typeof __SERVER__!=='undefined' && __SERVER__===true
 }
+function isGitPage() {
+  return isBrowser() && location.href.indexOf('github.io/')>-1
+}
 function defer() {
   let resolve, reject;
   const promise = new Promise((_resolve, _reject) => {
