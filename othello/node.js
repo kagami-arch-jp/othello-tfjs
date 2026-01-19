@@ -85,7 +85,7 @@ async function generateTracks(model, {
             await agent_step(isAgentFirst? POS_BLACK: POS_WHITE, false)
           }
         }else{
-          const LEARN_FROM_AGENT_RATIO=11/32
+          const LEARN_FROM_AGENT_RATIO=9/32
           if(isTraining && Math.random()<LEARN_FROM_AGENT_RATIO) {
             await agent_step(isAgentFirst? POS_WHITE: POS_BLACK, true)
           }else{
@@ -125,7 +125,7 @@ if(!isBrowser()) main({
   epochsPerDataset: 5,
 
   testFunc: async model=>{
-    const n=5000
+    const n=10000
     console.log('test '+n*2+' rounds..')
     const agentFirst=await generateTracks(model, {n, isAgentFirst: true})
     const agentSecond=await generateTracks(model, {n, isAgentFirst: false})
@@ -151,7 +151,7 @@ if(!isBrowser()) main({
   },
 
   generateConfig: {
-    min: 25000,
+    min: 10000,
     fn: async model=>{
       const n=5000
       const [agentFirst, agentSecond]=await Promise.all([

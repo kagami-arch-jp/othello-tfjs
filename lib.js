@@ -38,12 +38,9 @@ function assert(x) {
   if(!x) throw new Error(`Uncaught AssertionError [ERR_ASSERTION]: ${x} == true`)
 }
 
-let gameName=null
-function setGameName(x) {
-  gameName=x
-}
+const gameName='othello'
+
 function fetchSaveRecord(steps) {
-  assert(gameName)
   const sav=JSON.stringify(steps)
   const xhr=new XMLHttpRequest
   xhr.open('POST', `/do?a=save`, true)
@@ -181,7 +178,6 @@ process.exit()
 */
 
 function getRecordJSONList(sort) {
-  assert(gameName)
   try{
     const exp_dir=__dirname+'/'+gameName+'/tracks'
     const arr=fs.readdirSync(exp_dir).filter(x=>x.indexOf('.json')>-1)
@@ -201,7 +197,6 @@ function getRecordJSONList(sort) {
 }
 
 function removeTestRecords() {
-  assert(gameName)
   try{
     getRecordJSONList().forEach(fn=>{
       if(isHumanRecord(fn)) {
@@ -256,7 +251,6 @@ function removeDuplicateRecord(toKey) {
 
 let rec_i=0
 function nodeSaveRecord(steps, isByHuman) {
-  assert(gameName)
   const exp_dir=__dirname+'/'+gameName+'/tracks'
   try{
     fs.mkdirSync(exp_dir)
@@ -278,7 +272,6 @@ function rsort(arr) {
 }
 
 function generateExpertTracks(toTrainData, maxFilePerIter=100) {
-  assert(gameName)
   const fnList=getRecordJSONList()
   const fnCache={}
   function loadFile(fn) {
@@ -392,7 +385,6 @@ async function main({
   lossFunc,
 
 }) {
-  assert(gameName)
   const [model, save]=await loadModel(createModelFunc)
 
   const task=!isBrowser() && (_=>{

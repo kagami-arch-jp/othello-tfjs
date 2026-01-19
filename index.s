@@ -8,7 +8,6 @@ const qs=require('querystring')
 const url=require('url')
 
 const lib=include_js('./lib.js')
-lib.setGameName('othello')
 
 const {query}=url.parse($_RAW_REQUEST.url)
 const q=qs.parse(query)

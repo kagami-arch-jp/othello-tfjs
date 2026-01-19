@@ -72,7 +72,7 @@ function newMap(emptyMap) {
 }
 function newRoundModel() {
   const map=newMap()
-  let nextPlayer=1
+  let nextPlayer=POS_BLACK
   let gameover=0
 
   const customSteps=[]
@@ -82,7 +82,7 @@ function newRoundModel() {
   }
 
   function changePlayer() {
-    nextPlayer=3-nextPlayer
+    nextPlayer=POS_BLACK+POS_WHITE-nextPlayer
   }
 
   function getPlayer(returnId) {
@@ -223,8 +223,6 @@ function mask_map(map, next) {
   }
   return m
 }
-
-setGameName('othello')
 
 if(isBrowser()) main({
   browserFunc: async model=>{
