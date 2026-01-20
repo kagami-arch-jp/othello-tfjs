@@ -85,7 +85,7 @@ async function generateTracks(model, {
             await agent_step(isAgentFirst? POS_BLACK: POS_WHITE, false)
           }
         }else{
-          const LEARN_FROM_AGENT_RATIO=9/32
+          const LEARN_FROM_AGENT_RATIO=15/32
           if(isTraining && Math.random()<LEARN_FROM_AGENT_RATIO) {
             await agent_step(isAgentFirst? POS_WHITE: POS_BLACK, true)
           }else{
