@@ -54,6 +54,7 @@ async function generateTracks(model, {
   n=100,
   isAgentFirst=false,
   random=false,
+  isFromTest=false,
 }, isTraining) {
 
   let agentWins=0, randomWins=0, drawRound=0
@@ -62,6 +63,7 @@ async function generateTracks(model, {
 
   async function newRound() {
     const g=newRoundModel()
+    const LEARN_FROM_AGENT_RATIO=Math.random()<.9? 9/32: 0
     for(let randomStep=1; !g.isGameover();) {
       const isAgentStep=g.getPlayer()===(isAgentFirst? 'black': 'white')
       function random_step(record=false) {
@@ -85,7 +87,6 @@ async function generateTracks(model, {
             await agent_step(isAgentFirst? POS_BLACK: POS_WHITE, false)
           }
         }else{
-          const LEARN_FROM_AGENT_RATIO=15/32
           if(isTraining && Math.random()<LEARN_FROM_AGENT_RATIO) {
             await agent_step(isAgentFirst? POS_WHITE: POS_BLACK, true)
           }else{
@@ -97,14 +98,19 @@ async function generateTracks(model, {
 
     const [bn, wn]=g.getState()
     const isAgentWin=(isAgentFirst && bn>wn) || (!isAgentFirst && bn<wn)
-    if(isAgentWin) {
+    const isDraw=bn===wn
+
+    if(isDraw) {
+      drawRound++
+    }else if(isAgentWin) {
       agentWins++
-    }else if(isTraining && bn!==wn) {
+    }else{
       randomWins++
-      const arr=g.customSteps
-      arr.length && nodeSaveRecord(arr)
     }
-    if(bn===wn) drawRound++
+
+    if((isTraining || isFromTest) && g.customSteps && !isAgentWin && !isDraw) {
+      nodeSaveRecord(g.customSteps, isFromTest)
+    }
   }
 
   const rounds=[]
@@ -125,10 +131,10 @@ if(!isBrowser()) main({
   epochsPerDataset: 5,
 
   testFunc: async model=>{
-    const n=10000
+    const n=5000
     console.log('test '+n*2+' rounds..')
-    const agentFirst=await generateTracks(model, {n, isAgentFirst: true})
-    const agentSecond=await generateTracks(model, {n, isAgentFirst: false})
+    const agentFirst=await generateTracks(model, {n, isAgentFirst: true, isFromTest: true})
+    const agentSecond=await generateTracks(model, {n, isAgentFirst: false, isFromTest: true})
     const randomFirst=await generateTracks(null, {n, isAgentFirst: true, random: true})
     const randomSecond=await generateTracks(null, {n, isAgentFirst: false, random: true})
 
@@ -151,7 +157,7 @@ if(!isBrowser()) main({
   },
 
   generateConfig: {
-    min: 10000,
+    min: 5000,
     fn: async model=>{
       const n=5000
       const [agentFirst, agentSecond]=await Promise.all([
