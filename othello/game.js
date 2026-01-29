@@ -172,7 +172,7 @@ function initPage(map, agentPlayer) {
     </div>
   </div>`
   const n=agentPlayer===POS_BLACK? 1: 2
-  const txt=n===1? 'Player First': 'Agent First'
+  const txt=n===POS_BLACK? 'Player First': 'Agent First'
   str+=`<div class="btns">
     <a href="?f=${n}">${txt}</a>
     <a href="?f=${3-n}&r=${Date.now()}">New Game</a>
