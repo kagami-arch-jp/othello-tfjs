@@ -54,6 +54,7 @@ async function generateTracks(model, {
   n=100,
   isAgentFirst=false,
   random=false,
+  isTest=false,
 }, isTraining) {
 
   let agentWins=0, randomWins=0, drawRound=0
@@ -62,7 +63,7 @@ async function generateTracks(model, {
 
   async function newRound() {
     const g=newRoundModel()
-    const LEARN_FROM_AGENT_RATIO=Math.random()<.7? 13/32: 0
+    const LEARN_FROM_AGENT_RATIO=Math.random()<.7? 17/32: 0
     const AVAILABLE_RATIO=.2
     for(let randomStep=1; !g.isGameover();) {
       const isAgentStep=g.getPlayer()===(isAgentFirst? 'black': 'white')
@@ -87,11 +88,10 @@ async function generateTracks(model, {
             await agent_step(isAgentFirst? POS_BLACK: POS_WHITE, false)
           }
         }else{
-          const shouldSave=Math.random()<AVAILABLE_RATIO
           if(isTraining && Math.random()<LEARN_FROM_AGENT_RATIO) {
-            await agent_step(isAgentFirst? POS_WHITE: POS_BLACK, shouldSave)
+            await agent_step(isAgentFirst? POS_WHITE: POS_BLACK, true)
           }else{
-            random_step(shouldSave)
+            random_step(true)
           }
         }
       }
@@ -109,8 +109,13 @@ async function generateTracks(model, {
       randomWins++
     }
 
-    if(isTraining && g.customSteps?.length && !isAgentWin && !isDraw) {
-      nodeSaveRecord(g.customSteps)
+    if((isTraining || isTest) && !isAgentWin && !isDraw) {
+      const steps=g.customSteps.filter((v, i)=>{
+        if(g.customSteps.length<6) return true
+        if((!bn || !wn) && i===g.customSteps.length-1) return true
+        return Math.random()<AVAILABLE_RATIO
+      })
+      if(steps.length) nodeSaveRecord(steps, isTest)
     }
   }
 
@@ -132,33 +137,40 @@ if(!isBrowser()) main({
   epochsPerDataset: 5,
 
   testFunc: async model=>{
-    const n=5000
-    console.log('test '+n*2+' rounds..')
-    const agentFirst=await generateTracks(model, {n, isAgentFirst: true})
-    const agentSecond=await generateTracks(model, {n, isAgentFirst: false})
-    const randomFirst=await generateTracks(null, {n, isAgentFirst: true, random: true})
-    const randomSecond=await generateTracks(null, {n, isAgentFirst: false, random: true})
+    const N=50000, step=250
+    const rets={
+      n: 0,
+      firstMove: {win: 0, draw: 0},
+      secondMove: {win: 0, draw: 0},
+    }
+    let logs=0
+    for(let i=0; i<N; i+=step) {
+      let str=`[${i+step}/${N}] `
+      const agentFirst=await generateTracks(model, {n: step, isAgentFirst: true, isTest: true})
+      const agentSecond=await generateTracks(model, {n: step, isAgentFirst: false, isTest: true})
+      //const randomFirst=await generateTracks(null, {n: step, isAgentFirst: true, random: true})
+      //const randomSecond=await generateTracks(null, {n: step, isAgentFirst: false, random: true})
 
-    const v=x=>(x/n*100).toFixed(1)+'%'
-    const toRet=x=>({
-      win: v(x.agentWins),
-      draw: v(x.drawRound),
-    })
+      rets.n+=step
+      rets.firstMove.win+=agentFirst.agentWins
+      rets.firstMove.draw+=agentFirst.drawRound
+      rets.secondMove.win+=agentSecond.agentWins
+      rets.secondMove.draw+=agentSecond.drawRound
 
-    console.table({
-      'first move': {
-        agent: toRet(agentFirst),
-        random: toRet(randomFirst),
-      },
-      'second move': {
-        agent: toRet(agentSecond),
-        random: toRet(randomSecond),
-      },
-    })
+      const v=x=>(x/rets.n*100).toFixed(1)+'%'
+
+      str+=`First: win ${v(rets.firstMove.win)} | draw ${v(rets.firstMove.draw)}  Second: win ${v(rets.secondMove.win)} | draw ${v(rets.secondMove.draw)}         `
+
+      process.stdout.write('\b'.repeat(logs)+str)
+      logs=str.length
+
+    }
+    console.log('\n')
+
   },
 
   generateConfig: {
-    min: 60000,
+    min: 80000,
     fn: async model=>{
       const n=5000
       const [agentFirst, agentSecond]=await Promise.all([
