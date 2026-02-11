@@ -63,8 +63,8 @@ async function generateTracks(model, {
 
   async function newRound() {
     const g=newRoundModel()
-    const LEARN_FROM_AGENT_RATIO=Math.random()<.7? .5: 0
-    const AVAILABLE_RATIO=.2
+    const LEARN_FROM_AGENT_RATIO=Math.random()<.65? .41: 0
+    const AVAILABLE_RATIO=.19
     for(let randomStep=1; !g.isGameover();) {
       const isAgentStep=g.getPlayer()===(isAgentFirst? 'black': 'white')
       function random_step(record=false) {
@@ -111,8 +111,8 @@ async function generateTracks(model, {
 
     if((isTraining || isTest) && !isAgentWin && !isDraw) {
       const steps=g.customSteps.filter((v, i)=>{
-        if(g.customSteps.length<6) return true
-        if((!bn || !wn) && i>=g.customSteps.length-3) return true
+        if(g.customSteps.length<5) return true
+        if((!bn || !wn) && i===g.customSteps.length-1) return true
         return Math.random()<AVAILABLE_RATIO
       })
       if(steps.length) nodeSaveRecord(steps, isTest)
@@ -157,7 +157,7 @@ if(!isBrowser()) main({
       rets.secondMove.win+=agentSecond.agentWins
       rets.secondMove.draw+=agentSecond.drawRound
 
-      const v=x=>(x/rets.n*100).toFixed(1)+'%'
+      const v=x=>(x/rets.n*100).toFixed(2)+'%'
 
       str+=`First: win ${v(rets.firstMove.win)} | draw ${v(rets.firstMove.draw)}  Second: win ${v(rets.secondMove.win)} | draw ${v(rets.secondMove.draw)}         `
 
@@ -170,7 +170,7 @@ if(!isBrowser()) main({
   },
 
   generateConfig: {
-    min: 80000,
+    min: 100000,
     fn: async model=>{
       const n=5000
       const [agentFirst, agentSecond]=await Promise.all([
