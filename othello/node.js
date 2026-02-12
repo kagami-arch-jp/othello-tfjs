@@ -172,7 +172,7 @@ if(!isBrowser()) main({
   generateConfig: {
     min: 100000,
     fn: async model=>{
-      const n=5000
+      const n=6000
       const [agentFirst, agentSecond]=await Promise.all([
         generateTracks(model, {n, isAgentFirst: true}, true),
         generateTracks(model, {n, isAgentFirst: false}, true),
