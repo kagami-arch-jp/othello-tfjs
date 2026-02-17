@@ -63,9 +63,9 @@ async function generateTracks(model, {
 
   async function newRound() {
     const g=newRoundModel()
-    const LEARN_FROM_AGENT_RATIO=Math.random()<.65? .41: 0
-    const AVAILABLE_RATIO=.19
-    for(let randomStep=1; !g.isGameover();) {
+    const LEARN_FROM_AGENT_RATIO=Math.random()<.65? .43: 0
+    const AVAILABLE_RATIO=.93
+    for(let randomStep=RANDOM_STEPS+(isAgentFirst? 1: 0); !g.isGameover();) {
       const isAgentStep=g.getPlayer()===(isAgentFirst? 'black': 'white')
       function random_step(record=false) {
         g.doStep((_, validArr)=>{
@@ -159,7 +159,7 @@ if(!isBrowser()) main({
 
       const v=x=>(x/rets.n*100).toFixed(2)+'%'
 
-      str+=`First: win ${v(rets.firstMove.win)} | draw ${v(rets.firstMove.draw)}  Second: win ${v(rets.secondMove.win)} | draw ${v(rets.secondMove.draw)}         `
+      str+=`1st move: win ${v(rets.firstMove.win)} | draw ${v(rets.firstMove.draw)}  2nd move: win ${v(rets.secondMove.win)} | draw ${v(rets.secondMove.draw)}         `
 
       process.stdout.write('\b'.repeat(logs)+str)
       logs=str.length
@@ -170,9 +170,9 @@ if(!isBrowser()) main({
   },
 
   generateConfig: {
-    min: 100000,
+    min: 10000,
     fn: async model=>{
-      const n=6000
+      const n=5000
       const [agentFirst, agentSecond]=await Promise.all([
         generateTracks(model, {n, isAgentFirst: true}, true),
         generateTracks(model, {n, isAgentFirst: false}, true),

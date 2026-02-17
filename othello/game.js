@@ -1,6 +1,8 @@
 const MAP_R=8
 const POS_BLACK=1 // black move or next move
 const POS_WHITE=2 // white move
+const RANDOM_STEPS=2 // the initial x steps are random to increase result diversity.
+
 
 function findDirections(map, i, j, R, u, firstOnly) {
   const dirs=[]
@@ -243,7 +245,7 @@ if(isBrowser()) main({
     })
     render()
 
-    for(let randomStep=1; !g.isGameover(); ) {
+    for(let randomStep=RANDOM_STEPS+(agentFirst? 1: 0); !g.isGameover(); ) {
       await sleep(1e2)
       if(g.getPlayer()===customPlayer) continue
       await sleep(2e2)
