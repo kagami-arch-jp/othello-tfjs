@@ -63,8 +63,7 @@ async function generateTracks(model, {
 
   async function newRound() {
     const g=newRoundModel()
-    const LEARN_FROM_AGENT_RATIO=Math.random()<.65? .43: 0
-    const AVAILABLE_RATIO=.93
+    const LEARN_FROM_AGENT_RATIO=Math.random()<.5? .35: 0
     for(let randomStep=RANDOM_STEPS+(isAgentFirst? 1: 0); !g.isGameover();) {
       const isAgentStep=g.getPlayer()===(isAgentFirst? 'black': 'white')
       function random_step(record=false) {
@@ -110,12 +109,7 @@ async function generateTracks(model, {
     }
 
     if((isTraining || isTest) && !isAgentWin && !isDraw) {
-      const steps=g.customSteps.filter((v, i)=>{
-        if(g.customSteps.length<5) return true
-        if((!bn || !wn) && i===g.customSteps.length-1) return true
-        return Math.random()<AVAILABLE_RATIO
-      })
-      if(steps.length) nodeSaveRecord(steps, isTest)
+      nodeSaveRecord(g.customSteps, isTest)
     }
   }
 
