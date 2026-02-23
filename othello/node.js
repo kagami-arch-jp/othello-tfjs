@@ -63,7 +63,7 @@ async function generateTracks(model, {
 
   async function newRound() {
     const g=newRoundModel()
-    const LEARN_FROM_AGENT_RATIO=Math.random()<.5? .35: 0
+    const LEARN_FROM_AGENT_RATIO=Math.random()<.1? .45: 0
     for(let randomStep=RANDOM_STEPS+(isAgentFirst? 1: 0); !g.isGameover();) {
       const isAgentStep=g.getPlayer()===(isAgentFirst? 'black': 'white')
       function random_step(record=false) {
@@ -164,7 +164,7 @@ if(!isBrowser()) main({
   },
 
   generateConfig: {
-    min: 10000,
+    min: 5000,
     fn: async model=>{
       const n=5000
       const [agentFirst, agentSecond]=await Promise.all([
